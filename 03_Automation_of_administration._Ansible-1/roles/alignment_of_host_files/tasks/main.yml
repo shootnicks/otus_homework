@@ -1,0 +1,9 @@
+---
+- name: Copy file hosts
+  ansible.builtin.copy:
+    src: /etc/hosts
+    dest: /etc/
+    owner: root
+    group: root
+    mode: '0644'
+...
