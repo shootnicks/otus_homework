@@ -1,9 +1,9 @@
 ---
 - name: Setup nginx server
-  hosts: debian-test5
+  hosts: debian-test1
   become: true
   roles:
-    - role: alignment_of_host_files
+#    - role: alignment_of_host_files
     - role: common
     - role: nginx_install
     - role: nginx_deploy
