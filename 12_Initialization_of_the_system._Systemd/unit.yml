@@ -1,0 +1,20 @@
+---
+- name: Create unit
+  hosts: debian-test2
+  become: true
+  roles:
+    # - role: alignment_of_host_files
+    - role: common
+    - role: unit_monitoring
+      tags:
+        - unit_monitoring
+    - role: unit_spawn-fcgi
+      tags:
+        - unit_spawn-fcgi
+    - role: nginx_install
+      tags:
+        - unit_nginx
+    - role: unit_nginx
+      tags:
+        - unit_nginx
+...

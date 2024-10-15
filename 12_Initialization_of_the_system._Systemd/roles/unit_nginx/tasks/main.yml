@@ -1,0 +1,67 @@
+---
+- name: Copy file nginx@.service
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/etc/systemd/system/nginx@.service"
+    dest: /etc/systemd/system/nginx@.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create file with variables for unit
+  ansible.builtin.template:
+    src: nginx-.conf.j2
+    dest: "/etc/nginx/nginx-{{ item.name }}.conf"
+    backup: true
+  loop: "{{ nginx.conf }}"
+
+- name: Enable and start services
+  ansible.builtin.service:
+    name    : "nginx@{{ item.name }}"
+    state   : started
+  loop: "{{ nginx.conf }}"
+
+
+
+
+
+
+
+
+# - name: Install packages for spawn-fcgi
+#   ansible.builtin.apt:
+#     pkg: "{{ item }}"
+#     state: present
+#   loop: "{{ spawn_fcgi_pkgs }}"
+
+
+
+
+
+
+
+
+# - name: Create file watchlog.log
+#   ansible.builtin.template:
+#     src: watchlog.log.j2
+#     dest: /var/log/watchlog.log
+#     backup: true
+
+# - name: Copy file watchlog.sh
+#   ansible.builtin.copy:
+#     src: "{{ role_path }}/files/opt/watchlog.sh"
+#     dest: /opt/
+#     owner: root
+#     group: root
+#     mode: '0744'
+
+
+
+# - name: Copy file watchlog.timer
+#   ansible.builtin.copy:
+#     src: "{{ role_path }}/files/etc/systemd/system/watchlog.timer"
+#     dest: /etc/systemd/system/watchlog.timer
+#     owner: root
+#     group: root
+#     mode: '0644'
+
+...

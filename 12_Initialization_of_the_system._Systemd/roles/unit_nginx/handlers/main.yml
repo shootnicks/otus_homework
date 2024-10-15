@@ -1,0 +1,6 @@
+---
+- name: Restart unit_nginx
+  ansible.builtin.systemd_service:
+    service: nginx@.service
+    state: restarted
+...
