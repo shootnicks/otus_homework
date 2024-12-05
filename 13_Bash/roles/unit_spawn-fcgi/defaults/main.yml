@@ -1,0 +1,9 @@
+---
+spawn_fcgi_pkgs:
+  - spawn-fcgi
+  - php
+  - php-cgi
+  - php-cli
+  - apache2
+  - libapache2-mod-fcgid
+...

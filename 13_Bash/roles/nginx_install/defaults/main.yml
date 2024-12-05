@@ -1,0 +1,5 @@
+---
+nginx_pkgs:
+  - nginx
+#  - nginx-doc
+...
