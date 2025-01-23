@@ -1,0 +1,55 @@
+---
+  - name: Подготовка к созданию, (занулить суперблок)
+    ansible.builtin.shell: "mdadm --zero-superblock /dev/{{ disk0 }} /dev/{{ disk1 }} /dev/{{ disk2 }} /dev/{{ disk3 }}"
+
+  - name: Создание массива RAID 10
+    command: "mdadm --create /dev/{{ raid_name }} -l 10 -n 4 /dev/{{ disk0 }} /dev/{{ disk1 }} /dev/{{ disk2 }} /dev/{{ disk3 }}"
+    args:
+      creates: "/dev/{{ raid_name }}"
+
+  - name: Пауза 10 секунд
+    pause:
+      seconds: 10
+
+  - name: Создаём файловую систему ext4 на рейде
+    filesystem:
+      fstype: ext4
+      dev: "/dev/{{ raid_name }}"
+
+  - name: Создаём точку монтирования для рейда
+    file:
+      path: "{{ mount_point }}"
+      state: directory
+
+  - name: Монтируем рейд к точке монтирования
+    mount:
+      path: "{{ mount_point }}"
+      src: "/dev/{{ raid_name }}"
+      fstype: ext4
+      state: mounted
+
+  - name: Генерируем данные для конфигурационного файла
+    ansible.builtin.shell: mdadm --detail --scan
+    register: mdadm_conf
+
+  - name: Добавляем строчку в /etc/mdadm/mdadm.conf
+    ansible.builtin.lineinfile:
+      path: /etc/mdadm/mdadm.conf
+      line: "DEVICE partitions"
+
+  - name: Добавляем строчку в /etc/mdadm/mdadm.conf
+    ansible.builtin.lineinfile:
+      path: /etc/mdadm/mdadm.conf
+      line: "{{ mdadm_conf.stdout }}"
+
+  - name: Обновляем initramfs — начальную файловую систему, которая используется при загрузке системы.
+    ansible.builtin.shell: update-initramfs -u
+
+  - name: Добавляем точку монтирования в /etc/fstab
+    ansible.builtin.mount:
+      path: "{{ mount_point }}"
+      src: "/dev/{{ raid_name }}"
+      fstype: ext4
+      opts: defaults
+      state: present
+...

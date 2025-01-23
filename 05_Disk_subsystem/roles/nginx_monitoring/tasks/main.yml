@@ -1,0 +1,9 @@
+---
+- name: Copy file monitoring_nginx
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/etc/cron.hourly/monitoring_nginx"
+    dest: /etc/cron.hourly
+    owner: root
+    group: root
+    mode: '0766'
+...

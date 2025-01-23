@@ -1,0 +1,6 @@
+---
+watchlog:
+  default:
+    WORD: ALERT
+    LOG: /var/log/watchlog.log
+...

@@ -1,0 +1,7 @@
+---
+- name: Install nginx packages
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+  loop: "{{ mdadm_pkgs }}"
+...

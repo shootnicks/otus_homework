@@ -1,0 +1,6 @@
+---
+- name: initialization of the watchlog.service service
+  ansible.builtin.systemd_service:
+    service: watchlog.service
+    state: started
+...

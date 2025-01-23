@@ -1,0 +1,7 @@
+---
+- name: Setup nginx monitoring
+  hosts: debian-test3
+  become: true
+  roles:
+    - role: nginx_monitoring
+...

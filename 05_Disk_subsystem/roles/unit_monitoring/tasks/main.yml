@@ -1,0 +1,45 @@
+---
+- name: Create file with variables for unit
+  ansible.builtin.template:
+    src: watchlog.j2
+    dest: /etc/default/watchlog
+    backup: true
+
+- name: Create file watchlog.log
+  ansible.builtin.template:
+    src: watchlog.log.j2
+    dest: /var/log/watchlog.log
+    backup: true
+
+- name: Copy file watchlog.sh
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/opt/watchlog.sh"
+    dest: /opt/
+    owner: root
+    group: root
+    mode: '0744'
+
+- name: Copy file watchlog.service
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/etc/systemd/system/watchlog.service"
+    dest: /etc/systemd/system/watchlog.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy file watchlog.timer
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/etc/systemd/system/watchlog.timer"
+    dest: /etc/systemd/system/watchlog.timer
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enable and start service watchlog.timer
+  ansible.builtin.service:
+    name    : watchlog.timer
+    state   : started
+    enabled : yes
+  notify:
+    - initialization of the watchlog.service service
+...

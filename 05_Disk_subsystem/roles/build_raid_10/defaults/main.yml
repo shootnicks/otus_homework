@@ -1,0 +1,8 @@
+---
+disk0: sdb
+disk1: sdc
+disk2: sdd
+disk3: sde
+raid_name: md10
+mount_point: /mnt/raid10
+...

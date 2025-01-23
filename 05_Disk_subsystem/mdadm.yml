@@ -1,0 +1,7 @@
+---
+- name: Создаём mdadm raid 10 на Debian 12
+  hosts: debian-test5
+  roles:
+    - role: mdadm_install
+    - role: build_raid_10
+...

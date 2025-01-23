@@ -1,0 +1,4 @@
+---
+mdadm_pkgs:
+  - mdadm
+...
