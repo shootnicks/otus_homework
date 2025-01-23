@@ -15,6 +15,7 @@ Playbook расчитан на установку на Debian 12. Буранов
 
 Начальный вид блочных устройств:
 
+```bash
 root@debian-test5:~# lsblk
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
 sda      8:0    0    5G  0 disk
@@ -25,6 +26,7 @@ sdb      8:16   0    1G  0 disk
 sdc      8:32   0    1G  0 disk
 sdd      8:48   0    1G  0 disk
 sde      8:64   0    1G  0 disk
+```
 
 ## Выполнение задания
 
@@ -56,6 +58,7 @@ sde      8:64   0    1G  0 disk
 
 Итоговый вид блочных устройств:
 
+```bash
 root@debian-test5:~# lsblk
 NAME   MAJ:MIN RM  SIZE RO TYPE   MOUNTPOINTS
 sda      8:0    0    5G  0 disk
@@ -70,6 +73,7 @@ sdd      8:48   0    1G  0 disk
 └─md10   9:10   0    2G  0 raid10 /mnt/raid10
 sde      8:64   0    1G  0 disk
 └─md10   9:10   0    2G  0 raid10 /mnt/raid10
+```
 
 ## Готово
 
