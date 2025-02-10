@@ -1,0 +1,42 @@
+---
+- name   : Define variables
+  hosts  : localhost
+  gather_facts : no
+  vars_files:
+    - vars/vars_file.yml
+
+  tasks:
+    - name: Add nfs server host
+      add_host:
+        name         : "{{ item.name }}" 
+        ansible_host : "{{ item.ip }}"
+        groups       : nfs_servers
+      loop: "{{ nfs_servers }}"
+
+    - name: Add nfs client host
+      add_host:
+        name         : "{{ item.name }}" 
+        ansible_host : "{{ item.ip }}"
+        groups       : nfs_clients
+      loop: "{{ nfs_clients }}"
+
+- name: Install NFS
+  hosts: nfs_servers, nfs_clients
+  roles:
+    - role: common
+    - role: nfs_install
+
+- name: Setup server
+  hosts: nfs_servers
+  vars_files:
+    - vars/vars_file.yml
+  roles:
+    - role: nfs_setup_server
+
+- name: Setup client
+  hosts: nfs_clients
+  vars_files:
+    - vars/vars_file.yml
+  roles:
+    - role: nfs_setup_client
+...

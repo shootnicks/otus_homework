@@ -1,0 +1,10 @@
+---
+nginx:
+  conf:
+    - 0:
+      name: first
+      port: 9001
+    - 1:
+      name: second
+      port: 9002
+...

@@ -1,0 +1,32 @@
+---
+- name: Add nfs client to /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ item.ip }} {{ item.name }}"
+    create: yes
+  loop: "{{ nfs_clients }}"
+
+- name: Create export directory
+  ansible.builtin.file:
+    path: "{{ server_directory }}"
+    state: directory
+    mode: '0755'
+
+- name: Create upload directory
+  ansible.builtin.file:
+    path: "{{ server_directory }}/upload"
+    state: directory
+    mode: '0777'
+
+- name: Configure NFS exports
+  ansible.builtin.lineinfile:
+    path: /etc/exports
+    line: "{{ server_directory }} {{ item.name }}(rw,root_squash,sync,no_subtree_check)"
+    create: yes
+  loop: "{{ nfs_clients }}"
+
+- name: Restart NFS server
+  ansible.builtin.service:
+    name: nfs-kernel-server
+    state: restarted
+...

@@ -1,0 +1,23 @@
+---
+- name: Add nfs server to /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ item.ip }} {{ item.name }}"
+    create: yes
+  loop: "{{ nfs_servers }}"
+
+- name: Create mount point
+  ansible.builtin.file:
+    path: "{{ client_directory }}"
+    state: directory
+
+- name: Configure NFS client fstabs
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    line: "{{ nfs_servers.0.name }}:{{ server_directory }} {{ client_directory }} nfs,nfsvers=3,proto-tcp,noauto rw 0 0"
+    create: yes 
+
+- name: Execute command mount nfs share
+  ansible.builtin.shell: 
+    cmd: "systemctl daemon-reload && mount -a"
+...

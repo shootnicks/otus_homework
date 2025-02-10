@@ -1,0 +1,6 @@
+---
+- name: Start Nginx
+  ansible.builtin.systemd_service:
+    service: nginx
+    state: started
+...

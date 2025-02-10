@@ -1,0 +1,7 @@
+---
+- name: Install nfs packages
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+  loop: "{{ nfs_pkgs }}"
+...
