@@ -1,0 +1,52 @@
+---
+- name: Install pkgs for web
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+  loop: "{{ pkgs_for_web }}"
+
+- name: Copy nginx config
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/etc/nginx/nginx.conf"
+    dest: /etc/nginx
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+
+- name: Copy auditd rules config
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/etc/audit/rules.d/audit.rules"
+    dest: /etc/audit/rules.d
+    owner: root
+    group: root
+    mode: '0640'
+    backup: yes
+
+- name: Add rsyslog rule
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/etc/rsyslog.d/10-nginx-audit.conf"
+    dest: /etc/rsyslog.d
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+
+- name: Restart auditd
+  ansible.builtin.systemd:
+    unit: auditd
+    state: restarted
+    daemon_reload: yes
+
+- name: Restart nginx
+  ansible.builtin.systemd:
+    unit: nginx
+    state: restarted
+    daemon_reload: yes
+
+- name: Restart rsyslog
+  ansible.builtin.systemd:
+    unit: rsyslog
+    state: restarted
+    daemon_reload: yes
+...

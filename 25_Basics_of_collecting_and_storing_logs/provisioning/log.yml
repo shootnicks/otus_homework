@@ -1,0 +1,16 @@
+---
+- name: Обновляем пакеты
+  hosts: all
+  roles:
+    - role: common
+
+- name: Настраиваем Web сервер
+  hosts: WEB
+  roles:
+    - role: setup_web
+    
+- name: Настраиваем Log сервер
+  hosts: LOG
+  roles:
+    - role: setup_log
+...

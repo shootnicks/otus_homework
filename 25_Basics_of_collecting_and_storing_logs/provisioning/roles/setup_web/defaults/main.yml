@@ -1,0 +1,7 @@
+---
+pkgs_for_web:
+  - nginx
+  - auditd
+  - audispd-plugins
+  - curl
+...

@@ -1,0 +1,22 @@
+---
+- name: Install pkgs for log
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+  loop: "{{ pkgs_for_log }}"
+
+- name: Copy rsyslog config
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/etc/rsyslog.conf"
+    dest: /etc/
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+
+- name: Restart rsyslog
+  ansible.builtin.systemd:
+    unit: rsyslog
+    state: restarted
+    daemon_reload: yes
+...

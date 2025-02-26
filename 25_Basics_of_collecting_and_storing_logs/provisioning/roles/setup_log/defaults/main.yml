@@ -1,0 +1,6 @@
+---
+pkgs_for_log:
+  - auditd
+  - audispd-plugins
+  - curl
+...
