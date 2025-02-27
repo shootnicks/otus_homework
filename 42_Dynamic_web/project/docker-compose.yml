@@ -1,0 +1,85 @@
+---
+version: "3.8"
+
+services:
+
+  database:
+    container_name: database
+    image: mysql:8.0
+    restart: unless-stopped
+    networks:
+      - app-network
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - ./dbdata:/var/lib/mysql
+    command: '--default-authentication-plugin=mysql_native_password'
+    env_file:
+      - .env
+
+  wordpress:
+    container_name: wordpress
+    image: wordpress:5.1.1-fpm-alpine
+    restart: unless-stopped
+    networks:
+      - app-network
+    environment:
+      WORDPRESS_DB_HOST: database
+      WORDPRESS_DB_NAME: "${DB_NAME}"
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: "${DB_ROOT_PASSWORD}"
+    volumes:
+      - ./wordpress:/var/www/html
+    env_file:
+      - .env
+    depends_on:
+      - database
+
+  app:
+    build: ./python
+    container_name: app
+    restart: always
+    networks:
+      - app-network
+    command:
+      "gunicorn --workers=2 --bind=0.0.0.0:8000 mysite.wsgi:application"
+    env_file:
+      - .env
+
+  node:
+    container_name: node
+    image: node:16.13.2-alpine3.15
+    working_dir: /opt/server
+    volumes:
+      - ./node:/opt/server
+    command: node test.js
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+  nginx:
+    container_name: nginx
+    image: nginx:1.15.12-alpine
+    restart: unless-stopped
+    networks:
+      - app-network
+    ports:
+      - 8083:8083
+      - 8081:8081
+      - 8082:8082
+    volumes:
+      - ./wordpress:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+    env_file:
+      - .env
+    depends_on:
+      - wordpress
+      - app
+      - node
+
+networks:
+  app-network:
+    driver: bridge
+...
