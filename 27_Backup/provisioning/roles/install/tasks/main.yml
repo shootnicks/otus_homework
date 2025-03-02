@@ -1,0 +1,7 @@
+---
+- name: install_borg
+  apt:
+    name: borgbackup
+    update_cache: yes
+    state: present
+...
