@@ -1,0 +1,76 @@
+---
+# tasks file for others
+- name: mysqlsrc - Copy bet.dmp to /tmp/
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/mysqlsrc/tmp/bet.dmp"
+    dest: /tmp/
+    owner: root
+    group: root
+    mode: '0644'
+  when: inventory_hostname == "mysqlsrc"
+
+- name: mysqlsrc - Copy MySQL config
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/mysqlsrc/etc/mysql/mysql.conf.d/mysqld.cnf"
+    dest: "/etc/mysql/mysql.conf.d/mysqld.cnf"
+    owner: root
+    group: root
+    mode: '0644'
+  when: inventory_hostname == "mysqlsrc"
+
+- name: mysqlrep - Copy MySQL config
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/mysqlrep/etc/mysql/mysql.conf.d/mysqld.cnf"
+    dest: "/etc/mysql/mysql.conf.d/mysqld.cnf"
+    owner: root
+    group: root
+    mode: '0644'
+  when: inventory_hostname == "mysqlrep"
+
+- name: all hosts - restart MySQL
+  systemd:
+    unit: mysql.service
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+
+- name: mysqlsrc - Execute command create user for MySQL source
+  shell: 
+    cmd: mysql -e "CREATE USER repl@'%' IDENTIFIED WITH 'caching_sha2_password' BY 'oTUSlave#2020';"
+  when: inventory_hostname == "mysqlsrc"
+
+- name: mysqlsrc - Execute command MySQL grant replication
+  shell: 
+    cmd: mysql -e "GRANT REPLICATION SLAVE ON *.* TO repl@'%';"
+  when: inventory_hostname == "mysqlsrc"
+
+- name: mysqlsrc - Execute command MySQL flush privileges
+  shell: 
+    cmd: mysql -e "FLUSH PRIVILEGES;"
+  when: inventory_hostname == "mysqlsrc"
+
+- name: mysqlrep - Execute command MySQL stop replica
+  shell: 
+    cmd: mysql -e "STOP REPLICA;"
+  when: inventory_hostname == "mysqlrep"
+
+- name: mysqlrep - Execute command turn on MySQL replica
+  shell: 
+    cmd: mysql -e "CHANGE REPLICATION SOURCE TO SOURCE_HOST='192.168.56.11', SOURCE_USER='repl', SOURCE_PASSWORD='oTUSlave#2020', SOURCE_AUTO_POSITION = 1, GET_SOURCE_PUBLIC_KEY = 1;"
+  when: inventory_hostname == "mysqlrep"
+
+- name: mysqlrep - Execute command MySQL start replica
+  shell: 
+    cmd: mysql -e "START REPLICA;"
+  when: inventory_hostname == "mysqlrep"
+
+- name: mysqlsrc - Execute command create database bet
+  shell: 
+    cmd: mysql -e "CREATE DATABASE bet;"
+  when: inventory_hostname == "mysqlsrc"
+
+- name: mysqlsrc - Execute command import bet.dmp
+  shell: 
+    cmd: mysql -e "SOURCE /tmp/bet.dmp" bet
+  when: inventory_hostname == "mysqlsrc"
+...

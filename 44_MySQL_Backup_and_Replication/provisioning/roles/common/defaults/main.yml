@@ -1,0 +1,7 @@
+---
+# defaults file for common
+for_mysql_pkgs:
+  - mysql-server
+  # - curl
+  # - mc
+...

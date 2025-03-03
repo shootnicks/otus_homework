@@ -1,0 +1,32 @@
+---
+# tasks file for common
+- name: Copy MySQL repository
+  copy:
+    src   : "{{ role_path }}/files/etc/apt/sources.list.d/mysql.list"
+    dest  : "/etc/apt/sources.list.d/mysql.list"
+    owner : root
+    group : root
+    mode  : '0644'
+    backup: yes
+
+- name: Copy MySQL repository keyring
+  copy:
+    src   : "{{ role_path }}/files/usr/share/keyrings/mysql-apt-config.gpg"
+    dest  : "/usr/share/keyrings/mysql-apt-config.gpg"
+    owner : root
+    group : root
+    mode  : '0644'
+    backup: yes
+
+- name: Update and upgrade apt packages
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+    upgrade: safe
+
+- name: Update repositories cache and install mysql
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+  loop: "{{ for_mysql_pkgs }}"
+...

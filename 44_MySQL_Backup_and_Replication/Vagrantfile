@@ -1,0 +1,38 @@
+Vagrant.configure("2") do |config|
+  # Base VM OS configuration.
+  config.vm.box = "debian/bookworm64"
+  config.vm.provider :virtualbox do |v|
+    v.memory = 2048
+    v.cpus = 2
+  end
+
+  # Define two VMs with static private IP addresses.
+  boxes = [
+    { :name => "mysqlsrc",
+      :ip => "192.168.56.11",
+      :host => "1122",
+    },
+    { :name => "mysqlrep",
+      :ip => "192.168.56.12",
+      :host => "1222",
+    }
+  ]
+  # Provision each of the VMs.
+  boxes.each do |opts|
+    config.vm.define opts[:name] do |config|
+      config.vm.hostname = opts[:name]
+      config.vm.network "private_network", ip: opts[:ip]
+      config.vm.network "forwarded_port", guest: 22, host: opts[:host], id: "ssh"
+
+      if opts[:name] == "mysqlrep" # Добавляем условие, чтобы playbook запускался после создания последней ВМ
+        # Provision with Ansible for each machine
+        config.vm.provision "ansible" do |ansible|
+          ansible.limit = "all" # Чтобы был доступ ко всем ВМ
+          ansible.config_file = "provisioning/ansible.cfg" # Путь к конфиг файлу ansible
+          ansible.playbook = "provisioning/playbook.yml"  # Путь к общему playbook
+          ansible.become = true  # Если нужны привилегии суперпользователя
+        end
+      end
+    end
+  end
+end
